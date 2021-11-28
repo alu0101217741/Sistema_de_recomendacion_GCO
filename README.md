@@ -109,7 +109,7 @@ Este método aplica la medida de similitud basada en la correlación de Pearson 
 
 En primer lugar, se calculan las medias para ambos usuarios, para lo que se utilizan todos las valoraciones, independientemente si el otro usuario ha valorado ese item o no. Después se recorre por ítems la matriz de utilidad comprobando que el item haya sido calificado por ambos usuarios, y si esto es así se calculan los sumatorios que componen la siguiente fórmula:
 
-# FORMULA CORRELACION PEARSON
+![Formula Pearson](img/formula_pearson.png)
 
 Por último, cuando se tienen los sumatorios se aplica las operaciones de la fórmula y se devuelve el resultado. Cabe destacar que la similitud obtenida ouede variar desde -1 hasta 1 y aporta la siguiente información:
 
@@ -123,7 +123,7 @@ Por último, cuando se tienen los sumatorios se aplica las operaciones de la fó
   
 Otra de las métricas que se puede aplicar es la distancia coseno donde el recorrido de la matriz de utilidad se hace de la misma forma que en el método anterior, pero en este caso se aplica la siguiente fórmula:
 
-# FORMULA Distancia coseno
+![Formula Coseno](img/formula_coseno.png)
   
 Los valores de similitud que se pueden obtener varía desde 0 hasta 1 e indican lo siguiente:
 
@@ -135,7 +135,7 @@ Los valores de similitud que se pueden obtener varía desde 0 hasta 1 e indican 
 
 La última métrica es la distancia Euclídea donde también se recorre la matriz de utilidad para verificar que los dos usuarios hayan calificado ese item, y en ese caso se calcula el sumatorio que se emplea en la siguiente fórmula:
 
-# FORMULA Distancia euclidea
+![Formula Euclidea](img/formula_euclidea.png)
 
 Finalmente se aplica la raíz cuadrada sobre el sumatorio y se devuelve el resultado. 
   
@@ -173,7 +173,7 @@ Para ello primero se obtienen los vecinos del usuario empleando el método `calc
 
 Tras ello, se recorre el array `vecinos` para calcular los sumatorios que se muestran en la siguiente fórmula:
 
-# CAPTURA FORMULA PREDICCION SIMPLE
+![Prediccion simple](img/prediccion_simple.png)
 
 Después se realiza la operación `sumatorio1/sumatorio2`, el resultado se almacena en `prediccion`, y se añade al atributo `calculo_predicciones` el array `[usuario, item, sumatorio1, sumatorio2, prediccion]` para que sea posible mostrar junto con los resultados el proceso seguido para obtener la predicción. Finalmente se devuelve el valor de la variable `prediccion`.
 
@@ -183,7 +183,7 @@ El otro tipo de predicción que se puede utilizar es el que utiliza la diferenci
 
 Por tanto, ahora se calcula la media del usuario y de cada uno de sus vecinos con el método `calcular_media(usuario)`. Al igual que antes se recorre el vector que incluye los vecinos más proximos con el objetivo de obtener los dos sumatorios que se emplean en la fórmula para la diferencia media.
 
-# CAPTURA FORMULA diferencia media
+![Diferencia media](img/prediccion_diferencia_media.png)
 
 Tras ello, se realiza la operación `media_usuario + (sumatorio1 / sumatorio2)` y el resultado se almacena en `prediccion`. Luego se añade al atributo `calculo_predicciones` el array `[usuario, item, media_usuario, sumatorio1, sumatorio2, prediccion]` donde a diferencia del anterior se incluye la mdeia del usuario. Por último, se devuelve el valor de la predicción.
 
@@ -210,7 +210,7 @@ El sistema de recomendación esta disponible accediendo al siguiente enlace:
 
 Una vez que se haya accedido se mostrará una página web con el formulario que se muestra a continuación:
 
-# CAPTURA FORMULARIO
+![Formulario](img/formulario.png)
   
 Como se puede observar se solicitan los siguientes datos:
 
@@ -225,4 +225,5 @@ Cuando el usuario termina de introducir estos parámetros debe pulsar el botón 
 
 A través de la siguiente animación se muestra un ejemplo de uso del programa:
 
-# HACER VÍDEO
+![Ejemplo_de_uso](img/ejemplo_de_uso.gif)
+
