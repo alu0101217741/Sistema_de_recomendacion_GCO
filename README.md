@@ -4,7 +4,9 @@
 
 
 <p align="center">
+  <br>
   Acceda al sistema de recomendación: <a href="https://alu0101217741.github.io/Sistema_de_recomendacion_GCO/">https://alu0101217741.github.io/Sistema_de_recomendacion_GCO/</a>
+  <br>
 </p>
 
 
@@ -68,7 +70,7 @@ Tras ello, se crea el objeto `recomendador` de la clase `Recomendador` pasándol
  
  Este fichero incluye la clase `Recomendador` que implementa un recomendador siguiendo el método del filtrado colaborativo.
  
- #### Constructor
+ ### Constructor
  El constructor de la clase es el que se muestra a continuación:
  
  ```js
@@ -97,7 +99,7 @@ Con los parámetros recibidos se inicializan algunos de los atributos de la clas
  
 En ambas estructuras la variable `prediccion` almacena el cálculo final de la predicción. Al igual que en `this.vecinos_usuarios`, esta matriz se emplea para mostrar el proceso que se ha seguido para obtener los resultados en las diferentes predicciones.
 
-#### crear_matriz_similitud(metrica)
+### crear_matriz_similitud(metrica)
 
 Para generar la matriz de similaridad se llama desde el constructor al método `crear_matriz_similitud(metrica)` pasándole el tipo de métrica que se esta utilizando. En este método se va a crear una matriz cuadrada formada tanto en las filas como en las columnas por usuarios, de forma que se muestra el grado de relación entre cada par de usuarios. Para lograrlo se recorre por filas la matriz de utilidad y se calcula la similitud de un usuario `i` con el resto, el resultado obtenido depende de la métrica que se este aplicando.
 
@@ -105,25 +107,122 @@ Para generar la matriz de similaridad se llama desde el constructor al método `
 
 Este método aplica la medida de similitud basada en la correlación de Pearson que se trata de un índice que se puede emplear para medir la relación entre dos variables cuantitativas y continuas. 
 
-En primer lugar, se calculan las medias para ambos usuarios, para lo que se utilizan todos las valoraciones, independientemente si el otro usuario ha valorado ese item o no. Después se recorre por ítems la matriz de utilidad comprobando que el item haya sido calificado por ambos usuarios, y si esto se calculan los sumatorios que componen la siguiente fórmula:
+En primer lugar, se calculan las medias para ambos usuarios, para lo que se utilizan todos las valoraciones, independientemente si el otro usuario ha valorado ese item o no. Después se recorre por ítems la matriz de utilidad comprobando que el item haya sido calificado por ambos usuarios, y si esto es así se calculan los sumatorios que componen la siguiente fórmula:
 
 # FORMULA CORRELACION PEARSON
 
-Por último, cuando se tienen los sumatorios se aplica las operaciones de la fórmula y se devuelve el resultado.
+Por último, cuando se tienen los sumatorios se aplica las operaciones de la fórmula y se devuelve el resultado. Cabe destacar que la similitud obtenida ouede variar desde -1 hasta 1 y aporta la siguiente información:
 
+* Si `sim(u, v) = 1`, correlación directa perfecta.
+* Si `0 < sim(u, v) < 1`, correlación directa.
+* Si `sim(u, v) = 0`, no hay correlación.
+* Si `−1 < sim(u, v) < 0`, correlación inversa.
+* Si `sim(u, v) = −1`, correlación inversa perfecta.
 
+### distancia_coseno(usuario_u, usuario_v)
   
-  
-  
-  
-  
-  
-  
-  
-  
-Por último, se definen una serie de getters para poder obtener los atributos de la clase.
-  
-  
+Otra de las métricas que se puede aplicar es la distancia coseno donde el recorrido de la matriz de utilidad se hace de la misma forma que en el método anterior, pero en este caso se aplica la siguiente fórmula:
 
+# FORMULA Distancia coseno
   
+Los valores de similitud que se pueden obtener varía desde 0 hasta 1 e indican lo siguiente:
 
+* Si `sim(u, v) = 1`, correlación directa perfecta.
+* Si `0 < sim(u, v) < 1`, correlación directa.
+* Si `sim(u, v) = 0`, no hay correlación.
+  
+### distancia_euclidea(usuario_u, usuario_v)
+
+La última métrica es la distancia Euclídea donde también se recorre la matriz de utilidad para verificar que los dos usuarios hayan calificado ese item, y en ese caso se calcula el sumatorio que se emplea en la siguiente fórmula:
+
+# FORMULA Distancia euclidea
+
+Finalmente se aplica la raíz cuadrada sobre el sumatorio y se devuelve el resultado. 
+  
+### calcular_vecinos(usuario, item)
+  
+Cuando se calculan las predicciones para los ítems no calificados es necesario disponer de los vecinos más próximos del usuario, en este método se calculan dichos vecinos. Este método recibe como parámetro el número que identifica a un usuario y un determiando ítem.
+
+Primero se recorre la matriz de utilidad por filas y se añade al vector `similitud_vecinos` todos los vecinos de ese usuario, para incluirlos se utilizan objetos formados por las claves `vecino` y `similitud`.  
+ 
+```js
+  for (let i = 0; i < this.matriz_utilidad.length; i++) {
+    if (i != usuario)
+      similitud_vecinos.push({vecino: i, similitud: this.matriz_similitud[usuario][i]});
+  }
+ ```
+
+Cuando se dispone de todos los vecinos de un usuario hay que ordenarlos según la similitud, si se ha empleado la métrica basada en la correlación de Pearson o la distancia coseno se ordenan de mayor a menor, pero si se ha utilizado la distancia euclídea el orden es de menor a mayor.
+
+Por último, se recorre el vector `similitud_vecinos` para comprobar si el vecino ha valorado el ítem pasado como parámetro, si esto es así se incluye en el vector `seleccion_vecinos`. Esto se repite mientras `seleccion_vecinos` tenga un tamaño menor que el número de vecinos considerados, o no queden más vecinos dentro de `similitud_vecinos` que cumplan con esta característica. La comprobación realizada aquí es necesaria ya que en el cálculo de las predicciones los vecinos tienen que haber valorado el item cuya valoración se va a predecir.
+
+```js
+  let i = 0;
+  while ((seleccion_vecinos.length < this.num_vecinos) && (i < similitud_vecinos.length)) {
+    if (this.matriz_utilidad[similitud_vecinos[i].vecino][item] != -1)
+      seleccion_vecinos.push(similitud_vecinos[i]);
+      i++;
+  }
+ ```
+
+### prediccion_simple(usuario, item)
+
+Este método calcula la predicción de un usuario sobre un determinado ítem utilizando las puntuaciones asignadas a los ítems de los vecinos más próximos. 
+
+Para ello primero se obtienen los vecinos del usuario empleando el método `calcular_vecinos(usuario, item)` explicado anteriormente, cabe recordar que este método devuelve un vector con los vecinos en forma de objetos. Después se incluye en el atributo `this.vecinos_usuarios` el usuario e item considerado y los vecinos más cercanos, esto se hace para poder mostrarlo al sacar los resultados.
+
+Tras ello, se recorre el array `vecinos` para calcular los sumatorios que se muestran en la siguiente fórmula:
+
+# CAPTURA FORMULA PREDICCION SIMPLE
+
+Después se realiza la operación `sumatorio1/sumatorio2`, el resultado se almacena en `prediccion`, y se añade al atributo `calculo_predicciones` el array `[usuario, item, sumatorio1, sumatorio2, prediccion]` para que sea posible mostrar junto con los resultados el proceso seguido para obtener la predicción. Finalmente se devuelve el valor de la variable `prediccion`.
+
+### diferencia_media(usuario, item)
+
+El otro tipo de predicción que se puede utilizar es el que utiliza la diferencia con la media, que se trata de una solución para compensar las diferencias de interpretación ya que la predicción con simples promedios no tiene en cuenta las desviaciones.
+
+Por tanto, ahora se calcula la media del usuario y de cada uno de sus vecinos con el método `calcular_media(usuario)`. Al igual que antes se recorre el vector que incluye los vecinos más proximos con el objetivo de obtener los dos sumatorios que se emplean en la fórmula para la diferencia media.
+
+# CAPTURA FORMULA diferencia media
+
+Tras ello, se realiza la operación `media_usuario + (sumatorio1 / sumatorio2)` y el resultado se almacena en `prediccion`. Luego se añade al atributo `calculo_predicciones` el array `[usuario, item, media_usuario, sumatorio1, sumatorio2, prediccion]` donde a diferencia del anterior se incluye la mdeia del usuario. Por último, se devuelve el valor de la predicción.
+
+### recomendar()
+
+Este el método que permite obtener la matriz de utilidad con la predicción de los elementos faltantes en la matriz original.
+
+Para ello primero se realiza una copia de la matriz de utilidad en una nueva denominada `matriz_resuelta` que contendrá las predicciones obtenidas. Después se recorre la matriz de utilidad y se comprueba si en esa posición el valor es -1, lo que indica que un usuario no ha valorado un determinado item. En este caso se invocan a los métodos `prediccion_simple(usuario, item)` o `diferencia_media(usuario, item)` dependiendo del tipo de métrica que se este aplicando.
+
+Cuando se termina de recorrer la matriz de utilidad, ya se habrá conseguido almacenar en la variable `matriz_resuelta` la matriz de utilidad con todas las predicciones obtenidas. Esta matriz es lo que se devuelve en el método.
+
+### getters
+
+Los últimos métodos de la clase son getters para poder obtener los valores de los diferentes atributos.
+  
+  
+## 4. Intrucciones para utilizar el sistema
+
+El sistema de recomendación esta disponible accediendo al siguiente enlace:
+
+<p align="center">
+  <a href="https://alu0101217741.github.io/Sistema_de_recomendacion_GCO/">https://alu0101217741.github.io/Sistema_de_recomendacion_GCO/</a>
+</p>
+
+Una vez que se haya accedido se mostrará una página web con el formulario que se muestra a continuación:
+
+# CAPTURA FORMULARIO
+  
+Como se puede observar se solicitan los siguientes datos:
+
+* Fichero con la matriz de utilidad compuesta por las calificaciones de usuarios-ítems. Este fichero debe estar en formato `.txt`, en el directorio `examples-utility-matrices` se incluyen algunos ejemplos con los que se puede comprobar el adecuado funcionamiento del sistema. 
+* Métrica elegida, pudiendo seleccionar entre Correlación de Pearson, Distancia coseno y Distancia Euclídea.
+* Número de vecinos considerados (como mínimo debe ser 3).
+* El tipo de predicción, que puede ser predicción simple o diferencia con la media.
+
+Cuando el usuario termina de introducir estos parámetros debe pulsar el botón `CALCULAR PREDICCIÓN` y se mostrarán la matriz de similitud, la matriz de utilidad con las predicciones resueltas, los vecinos seleccionados y el cálculo realizado en cada predicción.
+
+## 5. Ejemplo de uso
+
+A través de la siguiente animación se muestra un ejemplo de uso del programa:
+
+# HACER VÍDEO
