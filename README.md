@@ -225,5 +225,5 @@ Cuando el usuario termina de introducir estos parámetros debe pulsar el botón 
 
 A través de la siguiente animación se muestra un ejemplo de uso del programa:
 
-![Ejemplo_de_uso](img/ejemplo_de_uso.gif)
+![Ejemplo_de_uso](img/animacion.gif)
 
