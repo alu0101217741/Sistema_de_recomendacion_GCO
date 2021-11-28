@@ -34,16 +34,7 @@ El sistema de recomendación se encuentra dentro de **docs** que incluye los sig
 A continuación, se describe el contenido de cada uno de los ficheros que forman el sistema de recomendación.
 
 ### 3.1. index.html
-En primer lugar, el fichero **index.html** contiene el formulario donde el usuario debe introducir los siguientes datos:
-
-* Fichero con la matriz de utilidad compuesta por las calificaciones de usuarios-ítems.
-* Métrica elegida, pudiendo seleccionar entre Correlación de Pearson, Distancia coseno y Distancia Euclídea.
-* Número de vecinos considerados.
-* El tipo de predicción, que puede ser predicción simple o diferencia con la media.
-
-Cuando el usuario termina de introducir estos parámetros debe pulsar el botón `CALCULAR PREDICCIÓN` y se mostrarán la matriz de similitud, la matriz de utilidad con las predicciones resueltas, los vecinos seleccionados y el cálculo realizado en cada predicción.
-
-Como ya se ha comentado anteriormente para aportar una adecuada presentación a este documento se ha empleado Materialize y la hoja de estilo style.css.
+En primer lugar, el fichero **index.html** contiene el formulario que el usuario debe completar para que sea posible realizar la recomendación. Como ya se ha comentado anteriormente para aportar una adecuada presentación a este documento se ha empleado Materialize y la hoja de estilo style.css.
 
 ### 3.2. formulario.js
 
